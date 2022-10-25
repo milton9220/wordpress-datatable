@@ -10,4 +10,41 @@ License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: 
 ******/
-?>
+
+require_once("PersonTables.php");
+
+function dataset_admin_page(){
+    add_menu_page('Dataset','Dataset','manage_options','dataset','render_dataset_table');
+}
+
+function datatable_search_by_name($data){
+    $name=strtolower($data['name']);
+    $search_name=sanitize_text_field($_REQUEST['s']);
+    if(strpos($name,$search_name) !==false){
+        return true;
+    }
+    return false;
+}
+
+function render_dataset_table(){
+    include_once "dataset.php";
+    if(isset($_REQUEST['s']) && !empty($_REQUEST['s'])){
+        $data=array_filter($data,'datatable_search_by_name');
+    }
+    $table= new PersonTables();
+    $table->set_data($data);
+    $table->prepare_items();
+    ?>
+    <div class="wrap">
+        <h2>Person's</h2>
+        <form method="GET">  
+            <?php 
+                $table->search_box('search','search_box');
+                $table->display();
+            ?>
+            <input type="hidden" name="page" value="dataset">
+        </form>
+    </div>
+    <?php 
+}
+add_action('admin_menu','dataset_admin_page');
