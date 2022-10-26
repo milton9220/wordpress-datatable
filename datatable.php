@@ -17,6 +17,8 @@ function dataset_admin_page(){
     add_menu_page('Dataset','Dataset','manage_options','dataset','render_dataset_table');
 }
 
+/**Data search array filter callback function */
+
 function datatable_search_by_name($data){
     $name=strtolower($data['name']);
     $search_name=sanitize_text_field($_REQUEST['s']);
@@ -26,13 +28,50 @@ function datatable_search_by_name($data){
     return false;
 }
 
+/**Data search array filter callback function end */
+
 function render_dataset_table(){
     include_once "dataset.php";
+
+    $order_by=$_REQUEST['orderby'] ?? '';
+    $order=$_REQUEST['order'] ?? '';
+
+    /**Before set table data if has search request */
+
     if(isset($_REQUEST['s']) && !empty($_REQUEST['s'])){
         $data=array_filter($data,'datatable_search_by_name');
     }
+    /**Before set table data if has search request code end */
+
     $table= new PersonTables();
+
+    /**Before set table data it sortable if has any request data */
+    if($order_by=='age'){
+        if($order=='asc'){
+            usort($data,function($item1,$item2){
+                return $item1['age']<=>$item2['age'];
+            });
+        }else{
+            usort($data,function($item1,$item2){
+                return $item2['age']<=>$item1['age'];
+            });
+        }
+    }
+    else if($order_by=='name'){
+        if($order=='asc'){
+            usort($data,function($item1,$item2){
+                return $item1['name']<=>$item2['name'];
+            });
+        }else{
+            usort($data,function($item1,$item2){
+                return $item2['name']<=>$item1['name'];
+            });
+        }
+    }
+    /**Before set table data it sortable if has any request data code end*/
+
     $table->set_data($data);
+
     $table->prepare_items();
     ?>
     <div class="wrap">
