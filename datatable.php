@@ -30,6 +30,19 @@ function datatable_search_by_name($data){
 
 /**Data search array filter callback function end */
 
+function datatable_filter_by_sex($data){
+    $sex=$_REQUEST['filter_sex'];
+    $sex=$sex ?? 'all';
+    if('all'==$sex){
+        return true;
+    }else{
+        if($sex==$data['sex']){
+            return true;
+        }
+    }
+    return false;
+}
+
 function render_dataset_table(){
     include_once "dataset.php";
 
@@ -41,7 +54,16 @@ function render_dataset_table(){
     if(isset($_REQUEST['s']) && !empty($_REQUEST['s'])){
         $data=array_filter($data,'datatable_search_by_name');
     }
+
     /**Before set table data if has search request code end */
+
+    /**Before set table data if has data filter  request */
+
+    if(isset($_REQUEST['filter_sex']) && !empty($_REQUEST['filter_sex'])){
+        $data=array_filter($data,'datatable_filter_by_sex');
+    }
+
+    /**Before set table data if has data filter  request code end */
 
     $table= new PersonTables();
 
